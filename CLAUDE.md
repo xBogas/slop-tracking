@@ -125,7 +125,7 @@ and say so.
 - Tests: `uv run pytest`. `tests/conftest.py` puts the module dirs on
   `sys.path`; two modules are named `demo.py`, so tests load
   `estimation/demo.py` by path.
-- Git: `.gitignore` drops `data/*` (keeps the folder), `out/`, images and `.venv`. Notebooks pass
+- Git: `.gitignore` drops `data/*` (keeps the folder), `out/` except `out/export/` (measurement CSVs), images and `.venv`. Notebooks pass
   through the `nbclean` filter (`.gitattributes`; outputs and metadata stripped on commit, local copies
   keep them). After a fresh clone, set it up with `git config filter.nbclean.clean "uv run --quiet jupyter
   nbconvert --clear-output --ClearMetadataPreprocessor.enabled=True --to notebook --stdout --stdin

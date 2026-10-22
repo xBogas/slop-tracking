@@ -8,8 +8,9 @@ __pycache__/
 data/*
 !data/.gitkeep
 
-# Generated results (rebuild with processing/pipeline.py)
-out/
+# Generated results (rebuild with processing/pipeline.py); the measurement export is kept
+out/*
+!out/export/
 
 # Images
 *.png
