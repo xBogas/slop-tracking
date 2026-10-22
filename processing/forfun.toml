@@ -1,0 +1,105 @@
+# Run configuration: group 4 "ForFun", phase 1 (pinger), runs 1-2.
+# Paths are relative to the repository root.
+# Time base: seconds since the start of the buoy files ("buoy time"),
+# which is 15:59:00 local (first ForFun run). The USBL file has its own
+# clock; usbl_time = buoy_time + clock_offset (solved from the data).
+
+[site]
+# Local ENU origin = the USBL GPS antenna ("USBL for other groups"). The
+# array itself is 5 m from it (USBL gps_offset), so it is not at (0, 0).
+origin_lat = 43.753285
+origin_lon = 15.785663
+buoy_t0_local = "15:59:00"
+date = "2026-10-20"          # inferred: LocReceivers.xlsx was created that day at 19:04 local, after the runs
+# Water level during the runs (~16:00-16:17 CEST), above the EMODnet DTM's vertical datum (mean sea level
+# in the Mediterranean). Astronomical prediction, Sibenik (tides4fishing.com, MLLW datum): HW 13:24 0.2 m,
+# LW 19:52 0.1 m -> ~0.165 m above MLLW at 16:00 (< 1 cm change over the runs); MSL ~0.15 m above MLLW.
+# The 0.1 m resolution and the unmeasured weather surge are the uncertainty.
+tide = 0.02                  # [m] added to the charted depth (bathy.Bathymetry.depth)
+tide_sigma = 0.2             # [m] PLACEHOLDER: surge + prediction error (multipath windows span tide +- this)
+declination = 5.4            # [deg] magnetic, east positive; approx. WMM at the site, 2026
+
+[[receiver]]
+name = "Rx902"
+kind = "buoy"
+file = "data/Rx902_Group4.wav"
+lat = 43.75
+lon = 15.78146
+height_above_seabed = 10.0   # [m] hydrophone above the seabed (operator); depth = water depth here - this
+pos_sigma = 15.0             # mooring/position uncertainty [m]
+
+[[receiver]]
+name = "Rx01"
+kind = "buoy"
+file = "data/Rx01_Group4.wav"
+lat = 43.74696
+lon = 15.7843
+height_above_seabed = 10.0
+pos_sigma = 15.0
+
+[[receiver]]
+name = "USBL"
+kind = "usbl"
+file = "data/grp4_15-56-00.wav"   # no .wav extension; 4-ch float32
+lat = 43.753285              # GPS antenna, not the array
+lon = 15.785663
+gps_offset = 5.0             # [m] GPS antenna -> array centre (operator)
+gps_offset_bearing = 223.4   # [deg true] ASSUMED: seaward ("SW"), normal to the array axis
+depth = 2.0                  # PLACEHOLDER: unknown, shore-mounted
+pos_sigma = 1.0              # GPS-surveyed
+clock_offset_guess = 102.7   # [s] from ping-envelope xcorr (+/- k * 1 s ambiguity); file name says 180
+axis_bearing = 128.0         # [deg magnetic] ch0 -> ch3 (operator: "ch1 -> ch4"); data: 130-132 deg true
+axis_bearing_sigma = 3.0     # [deg] PLACEHOLDER: compass reading on the mount
+element_spacing = [0.155, 0.155, 0.155]   # [m] nominal (operator). Not used: the delays give
+                             # 0.190 / 0.125 / 0.191 (usbl.py self-calibration, 0.44 us vs 10.7 us rms)
+wall_distance = [1.25, 1.17, 1.10, 1.00]  # [m] per channel, measured by usbl.py (user guessed 0.3-0.8)
+
+[pinger]
+f0 = 30000.0                 # LFM up-sweep, measured from the data
+f1 = 40000.0
+duration = 0.100             # [s], measured (~100 ms)
+interval = 1.000             # [s], measured
+depth = 3.0                 # [m], nominal (towed body; varies with speed)
+tow_length = 5.0             # [m] behind the boat
+
+# Run times from the data (notes/J_run_times.md), not the organisers' minute log (15:59 / 16:06 / 16:14,
+# i.e. 0 / 420 / 900 s): a run starts where the boat passes its start fix (lat/lon below). The pinger is
+# continuous from 52.4 s (before run 1) to the last arrival at 796.6 s.
+[[run]]
+name = "run1"
+start = 102.0                # buoy time [s]; boat passes the run 1 fix (14 m); straight leg from the 66-83 s turn
+end = 514.0
+pinger = true
+lat = 43.75129
+lon = 15.78608
+
+[[run]]
+name = "run2"
+start = 514.0                # passes the run 2 fix (14 m); the zig-zag turns start at 516 s
+end = 797.0                  # pinger off: last arrival 796.6 s (Rx902) + the pulse
+pinger = true
+lat = 43.75427
+lon = 15.78027
+
+[[run]]
+name = "run3"
+start = 985.0                # no pinger (phase 2); phase 2 track 29 m from the run 3 fix, weak (no measurements 926-984 s)
+end = 1020.0
+pinger = false
+lat = 43.75057
+lon = 15.78684
+
+[priors]
+sound_speed = 1529.0         # [m/s] physical prior: Adriatic in October (~20 C, S ~38 psu, 10 m); NOT observable from the data
+sound_speed_sigma = 4.0
+start_pos_sigma = 100.0      # [m] first ping position is only approximate
+fix_sigma = 10.0             # [m] PLACEHOLDER: run start fixes ([[run]] lat/lon, no time stamp) as priors, run_phase1.py --fixes
+
+[noise]
+# Phase 2: track from the boat's radiated noise. The boat is audible from
+# ~805 s (just after the last ping at 795.6 s) until the buoy files end.
+t0 = 796.0                   # solve window, buoy time [s]; starts where phase 1 ends
+t1 = 1020.0
+step = 1.0                   # epoch step [s]
+src_depth = 1.0              # PLACEHOLDER: propeller / noise-centre depth [m], unknown
+start_sigma = 15.0           # [m] on the start prior (last phase 1 boat position)

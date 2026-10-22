@@ -1,0 +1,17 @@
+[project]
+name = "boat-tracking"
+version = "0.1.0"
+requires-python = ">=3.13"
+dependencies = [
+    "matplotlib>=3.11.2",
+    "numpy>=2.5.4",
+    "scipy>=1.18.1",
+]
+
+[dependency-groups]
+dev = [
+    "ipykernel>=7.4.0",
+    "nbconvert>=7.17.2",
+    "plotly>=7.1.0",
+    "pytest>=9.1.1",
+]

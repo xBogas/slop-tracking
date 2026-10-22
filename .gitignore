@@ -1,0 +1,20 @@
+# Environment and caches
+.venv/
+__pycache__/
+.pytest_cache/
+.ipynb_checkpoints/
+
+# Recordings and bathymetry: keep only the folder
+data/*
+!data/.gitkeep
+
+# Generated results (rebuild with processing/pipeline.py)
+out/
+
+# Images
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.svg
+*.webp
